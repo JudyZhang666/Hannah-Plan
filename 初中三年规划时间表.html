@@ -1,0 +1,370 @@
+<div id="app-root">
+<style>
+  :root{
+    --bg:#f6f7f9; --surface:#ffffff; --ink:#20242e; --muted:#626a78;
+    --faint:#8a92a0; --line:#e7e9f0; --line-strong:#d6d9e2;
+    --spine:#3a4cb3; --spine-soft:#eef0fb;
+    --c-school:#2f6fb0; --bg-school:#e9f1fa;
+    --c-admit:#6a4fb0;  --bg-admit:#efeafb;
+    --c-intl:#1f8f74;   --bg-intl:#e3f4ef;
+    --c-ability:#bd6c1a; --bg-ability:#fbf0df;
+    --c-life:#4f8a2f;   --bg-life:#edf4e2;
+    --radius:12px; --radius-sm:8px;
+    --font:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#15171d; --surface:#1d2028; --ink:#e9ebf0; --muted:#a4abb8;
+      --faint:#777e8b; --line:#2b2f3a; --line-strong:#3a3f4d;
+      --spine:#8b97e8; --spine-soft:#23263a;
+      --c-school:#7fb1e6; --bg-school:#1c2b3a;
+      --c-admit:#a995e6;  --bg-admit:#262138;
+      --c-intl:#5fcaa8;   --bg-intl:#163029;
+      --c-ability:#e3a55c; --bg-ability:#322712;
+      --c-life:#8fc463;   --bg-life:#1f2d15;
+    }
+  }
+  *{box-sizing:border-box}
+  #app-root{font-family:var(--font);color:var(--ink);background:var(--bg);
+    line-height:1.6;-webkit-font-smoothing:antialiased;padding:20px;max-width:840px;margin:0 auto}
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+  h1{font-size:22px;font-weight:600;margin:0 0 4px}
+  .lede{color:var(--muted);font-size:14px;margin:0 0 20px;max-width:62ch}
+  .lede b{color:var(--ink);font-weight:600}
+
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:12px 14px;margin-bottom:16px}
+  .toolbar label{font-size:13px;color:var(--muted)}
+  select,input[type=text],button{font-family:inherit;font-size:14px;color:var(--ink);
+    background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--radius-sm);
+    padding:7px 10px;transition:border-color .15s}
+  select:focus,input:focus{outline:none;border-color:var(--spine);box-shadow:0 0 0 3px var(--spine-soft)}
+  button{cursor:pointer;background:var(--surface)}
+  button:hover{border-color:var(--spine)}
+  button.primary{background:var(--spine);color:#fff;border-color:var(--spine);font-weight:500}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost{border-color:transparent;color:var(--muted);padding:6px 8px}
+  button.ghost:hover{background:var(--bg);color:var(--ink)}
+  .spacer{flex:1}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-bottom:16px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-sm);padding:10px 12px}
+  .stat .n{font-size:22px;font-weight:600;line-height:1.2}
+  .stat .k{font-size:12px;color:var(--muted)}
+
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:14px 16px;margin-bottom:16px}
+  .panel h2{font-size:15px;font-weight:600;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+  .form-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:12px}
+  .field{display:flex;flex-direction:column;gap:4px}
+  .field label{font-size:12px;color:var(--muted)}
+  .field.grow{flex:1;min-width:160px}
+  .field input[type=text]{width:100%}
+  .hint{font-size:12px;color:var(--faint);margin:0 0 8px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--line-strong);
+    background:var(--surface);color:var(--muted);cursor:pointer}
+  .chip:hover{border-color:var(--spine);color:var(--ink)}
+  .chip .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px}
+
+  .filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .fbtn{font-size:13px;padding:5px 12px;border-radius:999px;border:1px solid var(--line-strong);
+    background:var(--surface);cursor:pointer;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+  .fbtn .dot{width:8px;height:8px;border-radius:50%}
+  .fbtn.on{color:var(--ink);border-color:currentColor}
+  .fbtn.off{opacity:.45;text-decoration:line-through}
+
+  .timeline{position:relative;padding-left:30px}
+  .timeline::before{content:"";position:absolute;left:10px;top:6px;bottom:6px;width:2px;background:var(--line-strong)}
+  .sem{margin-bottom:8px}
+  .sem-head{font-size:14px;font-weight:600;margin:18px 0 8px;display:flex;align-items:center;gap:8px}
+  .sem-head .grade{color:var(--spine)}
+  .sem-head .span{font-size:12px;color:var(--faint);font-weight:400}
+  .month{position:relative;margin-bottom:10px}
+  .node{position:absolute;left:-24px;top:14px;width:11px;height:11px;border-radius:50%;
+    background:var(--surface);border:2px solid var(--line-strong)}
+  .month.has .node{border-color:var(--spine);background:var(--spine)}
+  .month.now .node{border-color:var(--spine);background:var(--spine);box-shadow:0 0 0 4px var(--spine-soft)}
+  .mcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-sm);
+    padding:10px 12px}
+  .month.now .mcard{border-color:var(--spine)}
+  .mhead{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+  .mlabel{font-size:13px;font-weight:600}
+  .nowtag{font-size:11px;color:#fff;background:var(--spine);border-radius:999px;padding:1px 8px}
+  .madd{margin-left:auto;font-size:12px;color:var(--spine);background:none;border:none;cursor:pointer;padding:2px 4px}
+  .madd:hover{text-decoration:underline}
+  .empty{font-size:12px;color:var(--faint)}
+  .ev{display:flex;align-items:flex-start;gap:8px;padding:6px 8px;border-radius:6px;margin-top:6px;
+    border-left:3px solid var(--cc)}
+  .ev .body{flex:1;min-width:0}
+  .ev .t{font-size:13px}
+  .ev.done .t{text-decoration:line-through;color:var(--faint)}
+  .ev .note{font-size:12px;color:var(--muted);margin-top:1px}
+  .ev .cat{font-size:11px;color:var(--cc);font-weight:500}
+  .ev .acts{display:flex;gap:2px;flex-shrink:0}
+  .ev .acts button{border:none;background:none;color:var(--faint);font-size:13px;padding:2px 4px;cursor:pointer;border-radius:4px}
+  .ev .acts button:hover{background:var(--bg);color:var(--ink)}
+  .ev .check{flex-shrink:0;width:16px;height:16px;border:1.5px solid var(--line-strong);border-radius:4px;
+    cursor:pointer;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff}
+  .ev.done .check{background:var(--cc);border-color:var(--cc)}
+  .loading{text-align:center;color:var(--muted);padding:40px;font-size:14px}
+  .footnote{font-size:12px;color:var(--faint);margin-top:18px;border-top:1px solid var(--line);padding-top:12px}
+  @media print{.toolbar,.panel,.filters,.madd,.ev .acts,.footnote button{display:none!important}}
+</style>
+
+<span class="sr-only">初中三年规划时间表：按月份填写并保存从初一前暑假到高一上学期的重大事项。</span>
+
+<h1>初中三年规划时间表</h1>
+<p class="lede">从初一前的 7 月，一直排到高一上的 1 月。<b>不是马上判断哪条路最好，而是先把所有可能的路径都放进来</b>——每条占一个时间窗，各带几个要核实的条件。慢慢地，骨架就有了。数据会自动保存。</p>
+
+<div id="content"><div class="loading">正在载入你的时间表…</div></div>
+
+<p class="footnote">
+  这是一张活的工具，建议定期和孩子一起复盘、随时调整。
+  <button class="ghost" onclick="window.print()">打印 / 导出 PDF</button>
+</p>
+</div>
+
+<script>
+(function(){
+  const CATS = [
+    {id:"school",  name:"学校大事", color:"var(--c-school)",  bg:"var(--bg-school)",
+      tips:["期中 / 期末大考","体测 · 中考体育","开学 / 家长会","查校历，标节点"]},
+    {id:"admit",   name:"升学路径", color:"var(--c-admit)",   bg:"var(--bg-admit)",
+      tips:["1+3 报名窗口","2+4 报名窗口","0.5+3 报名窗口","登记入学（东西城）条件与时间","特长生选拔"]},
+    {id:"intl",    name:"国际 / 留学", color:"var(--c-intl)",  bg:"var(--bg-intl)",
+      tips:["公立校国际部报名","国际部 / 学校开放日"]},
+    {id:"ability", name:"能力培养", color:"var(--c-ability)", bg:"var(--bg-ability)",
+      tips:["自己做早饭 · 自己上学","报名某项竞赛","提前学规划与复盘","英语长期投入"]},
+    {id:"life",    name:"非学习块", color:"var(--c-life)",    bg:"var(--bg-life)",
+      tips:["寒 / 暑假旅行","长期兴趣活动","夏令营（查截止期 / 成绩单 / 推荐信）","搜“新初一 暑假 忙什么”","和孩子一起看时间表"]},
+  ];
+  const catById = id => CATS.find(c=>c.id===id) || CATS[0];
+
+  const KEY = "mschool-plan:v1";
+  const now = new Date();
+  const todayKey = now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0");
+
+  let state = { startYear: now.getFullYear(), events: {} };
+  let filterOff = {};   // catId -> true means hidden
+  let editingId = null;
+  let formMonth = null; // preselected month key when adding
+
+  // ---- month / semester model (child enters 初一 in Sept of startYear S) ----
+  function buildSemesters(S){
+    const mk = (y,m)=>({key:y+"-"+String(m).padStart(2,"0"), y, m, label:y+"年"+m+"月"});
+    const range=(y1,m1,y2,m2)=>{const a=[];let y=y1,m=m1;while(y<y2||(y===y2&&m<=m2)){a.push(mk(y,m));m++;if(m>12){m=1;y++}}return a;};
+    return [
+      {grade:"初一前", tag:"暑假",   span:"准备季", months:[mk(S,7),mk(S,8)]},
+      {grade:"初一",   tag:"上学期", span:"9月–次年1月", months:range(S,9,S+1,1)},
+      {grade:"初一",   tag:"下学期", span:"2月–6月",     months:range(S+1,2,S+1,6)},
+      {grade:"初一升初二", tag:"暑假", span:"",           months:[mk(S+1,7),mk(S+1,8)]},
+      {grade:"初二",   tag:"上学期", span:"9月–次年1月", months:range(S+1,9,S+2,1)},
+      {grade:"初二",   tag:"下学期", span:"2月–6月",     months:range(S+2,2,S+2,6)},
+      {grade:"初二升初三", tag:"暑假", span:"",           months:[mk(S+2,7),mk(S+2,8)]},
+      {grade:"初三",   tag:"上学期", span:"9月–次年1月", months:range(S+2,9,S+3,1)},
+      {grade:"初三",   tag:"下学期 · 中考", span:"2月–6月", months:range(S+3,2,S+3,6)},
+      {grade:"中考后", tag:"暑假 · 初升高", span:"",      months:[mk(S+3,7),mk(S+3,8)]},
+      {grade:"高一",   tag:"上学期", span:"9月–次年1月", months:range(S+3,9,S+4,1)},
+    ];
+  }
+  function allMonths(S){ return buildSemesters(S).flatMap(s=>s.months); }
+  function firstUpcoming(months){
+    for(const m of months){ if(m.key>=todayKey) return m.key; }
+    return null;
+  }
+
+  // ---- persistence ----
+  async function load(){
+    try{ const r = await window.storage.get(KEY);
+      if(r && r.value){ const p = JSON.parse(r.value); state = {startYear:p.startYear||state.startYear, events:p.events||{}}; }
+    }catch(e){ /* no saved plan yet — start fresh */ }
+  }
+  let saveTimer=null;
+  function save(){
+    clearTimeout(saveTimer);
+    saveTimer=setTimeout(async()=>{
+      try{ await window.storage.set(KEY, JSON.stringify(state)); }catch(e){}
+    },150);
+  }
+
+  // ---- mutations ----
+  function addEvent(monthKey, catId, title, note){
+    if(!title.trim()) return;
+    const ev={id:"e"+Date.now()+Math.random().toString(36).slice(2,6), cat:catId, title:title.trim(), note:(note||"").trim(), done:false};
+    (state.events[monthKey] ||= []).push(ev);
+    save();
+  }
+  function updateEvent(monthKey, catId, title, note){
+    for(const k in state.events){
+      const arr=state.events[k]; const i=arr.findIndex(e=>e.id===editingId);
+      if(i>-1){ const ev=arr[i]; arr.splice(i,1); if(!arr.length) delete state.events[k];
+        (state.events[monthKey]||=[]).push({...ev,cat:catId,title:title.trim(),note:(note||"").trim()}); break; }
+    }
+    editingId=null; save();
+  }
+  function deleteEvent(id){
+    for(const k in state.events){ const arr=state.events[k]; const i=arr.findIndex(e=>e.id===id);
+      if(i>-1){ arr.splice(i,1); if(!arr.length) delete state.events[k]; break; } }
+    if(editingId===id) editingId=null;
+    save();
+  }
+  function toggleDone(id){
+    for(const k in state.events){ const e=state.events[k].find(e=>e.id===id); if(e){ e.done=!e.done; break; } }
+    save();
+  }
+  function findEvent(id){ for(const k in state.events){ const e=state.events[k].find(e=>e.id===id); if(e) return {ev:e,month:k}; } return null; }
+
+  // ---- render ----
+  const $ = s => document.querySelector(s);
+  function esc(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+  function render(){
+    const S=state.startYear, sems=buildSemesters(S), months=allMonths(S);
+    const nowKey=firstUpcoming(months);
+
+    // stats
+    let total=0,done=0; const byCat={};
+    for(const k in state.events) for(const e of state.events[k]){ total++; if(e.done)done++; byCat[e.cat]=(byCat[e.cat]||0)+1; }
+
+    const yearOpts=[]; for(let y=now.getFullYear()-2;y<=now.getFullYear()+2;y++) yearOpts.push(`<option value="${y}" ${y===S?"selected":""}>${y} 年入学</option>`);
+
+    const monthOptions = sems.map(s=>{
+      const g=`${s.grade}·${s.tag}`;
+      const opts=s.months.map(m=>`<option value="${m.key}" ${m.key===formMonth?"selected":""}>${m.label}</option>`).join("");
+      return `<optgroup label="${g}">${opts}</optgroup>`;
+    }).join("");
+
+    const catSelect = CATS.map(c=>`<option value="${c.id}">${c.name}</option>`).join("");
+
+    const editing = editingId ? findEvent(editingId) : null;
+    if(editing && !formMonth) formMonth=editing.month;
+
+    const suggestions = CATS.map(c=>c.tips.map(t=>
+      `<button class="chip" data-sug="${c.id}" data-text="${esc(t)}"><span class="dot" style="background:${c.color}"></span>${esc(t)}</button>`
+    ).join("")).join("");
+
+    const filters = CATS.map(c=>{
+      const off=filterOff[c.id];
+      return `<button class="fbtn ${off?"off":"on"}" data-filter="${c.id}" style="color:${off?"":c.color}">
+        <span class="dot" style="background:${c.color}"></span>${c.name} <span style="opacity:.7">${byCat[c.id]||0}</span></button>`;
+    }).join("");
+
+    const timeline = sems.map(s=>{
+      const mh = s.months.map(m=>{
+        const evs=(state.events[m.key]||[]).filter(e=>!filterOff[e.cat]);
+        const isNow=m.key===nowKey;
+        const has=(state.events[m.key]||[]).length>0;
+        const evHtml = evs.length ? evs.map(e=>{
+          const c=catById(e.cat);
+          return `<div class="ev ${e.done?"done":""}" style="--cc:${c.color};background:${c.bg}">
+            <div class="check" data-toggle="${e.id}">${e.done?"✓":""}</div>
+            <div class="body">
+              <div class="cat">${c.name}</div>
+              <div class="t">${esc(e.title)}</div>
+              ${e.note?`<div class="note">待核实 / 备注：${esc(e.note)}</div>`:""}
+            </div>
+            <div class="acts">
+              <button data-edit="${e.id}" title="编辑">✎</button>
+              <button data-del="${e.id}" title="删除">✕</button>
+            </div>
+          </div>`;
+        }).join("") : `<div class="empty">还没有事项</div>`;
+        return `<div class="month ${has?"has":""} ${isNow?"now":""}">
+          <span class="node"></span>
+          <div class="mcard">
+            <div class="mhead">
+              <span class="mlabel">${m.label}</span>
+              ${isNow?'<span class="nowtag">你在这里</span>':""}
+              <button class="madd" data-month="${m.key}">+ 添加</button>
+            </div>
+            ${evHtml}
+          </div>
+        </div>`;
+      }).join("");
+      return `<div class="sem">
+        <div class="sem-head"><span class="grade">${s.grade}</span> · ${s.tag}
+          ${s.span?`<span class="span">${s.span}</span>`:""}</div>
+        ${mh}
+      </div>`;
+    }).join("");
+
+    $("#content").innerHTML = `
+      <div class="toolbar">
+        <label>孩子初一入学年份</label>
+        <select id="yearSel">${yearOpts}</select>
+        <div class="spacer"></div>
+        <button class="ghost" id="resetBtn">清空重来</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><div class="n">${total}</div><div class="k">已规划事项</div></div>
+        <div class="stat"><div class="n">${done}</div><div class="k">已核实 / 完成</div></div>
+        <div class="stat"><div class="n">${months.length}</div><div class="k">覆盖月份</div></div>
+        <div class="stat"><div class="n">${CATS.length}</div><div class="k">规划维度</div></div>
+      </div>
+
+      <div class="panel">
+        <h2>${editingId?"修改事项":"添加一条事项"}</h2>
+        <div class="form-row">
+          <div class="field"><label>放在哪个月</label>
+            <select id="fMonth">${monthOptions}</select></div>
+          <div class="field"><label>类别</label>
+            <select id="fCat">${catSelect}</select></div>
+          <div class="field grow"><label>事项</label>
+            <input type="text" id="fTitle" placeholder="例如：查 1+3 报名条件与截止时间"></div>
+        </div>
+        <div class="form-row">
+          <div class="field grow"><label>待核实条件 / 备注（可选）</label>
+            <input type="text" id="fNote" placeholder="例如：需成绩单 + 推荐信，截止 X 月 X 日"></div>
+          <button class="primary" id="addBtn">${editingId?"保存修改":"添加"}</button>
+          ${editingId?'<button class="ghost" id="cancelEdit">取消</button>':""}
+        </div>
+        <p class="hint">点下面的灵感，快速填入类别和事项 —— 先把可能用到的都放进来，之后再核实、再调整。</p>
+        <div class="chips">${suggestions}</div>
+      </div>
+
+      <div class="filters">${filters}</div>
+      <div class="timeline">${timeline}</div>
+    `;
+
+    if(editing){ $("#fCat").value=editing.ev.cat; $("#fTitle").value=editing.ev.title; $("#fNote").value=editing.ev.note; if(formMonth)$("#fMonth").value=formMonth; }
+    else if(formMonth){ $("#fMonth").value=formMonth; }
+
+    wire();
+  }
+
+  function wire(){
+    $("#yearSel").onchange=e=>{ state.startYear=+e.target.value; formMonth=null; editingId=null; save(); render(); };
+    $("#resetBtn").onclick=()=>{ if(confirm("确定清空所有已填事项？此操作无法撤销。")){ state.events={}; editingId=null; formMonth=null; save(); render(); } };
+
+    $("#addBtn").onclick=()=>{
+      const m=$("#fMonth").value, c=$("#fCat").value, t=$("#fTitle").value, n=$("#fNote").value;
+      if(!t.trim()){ $("#fTitle").focus(); return; }
+      if(editingId) updateEvent(m,c,t,n); else addEvent(m,c,t,n);
+      formMonth=m; render();
+    };
+    const ce=$("#cancelEdit"); if(ce) ce.onclick=()=>{ editingId=null; formMonth=null; render(); };
+
+    document.querySelectorAll("[data-sug]").forEach(b=>b.onclick=()=>{
+      $("#fCat").value=b.dataset.sug; $("#fTitle").value=b.dataset.text; $("#fTitle").focus();
+    });
+    document.querySelectorAll("[data-filter]").forEach(b=>b.onclick=()=>{
+      const id=b.dataset.filter; filterOff[id]=!filterOff[id]; render();
+    });
+    document.querySelectorAll("[data-month]").forEach(b=>b.onclick=()=>{
+      formMonth=b.dataset.month; editingId=null; render();
+      $("#fMonth").scrollIntoView({behavior:"smooth",block:"center"}); $("#fTitle").focus();
+    });
+    document.querySelectorAll("[data-toggle]").forEach(b=>b.onclick=()=>{ toggleDone(b.dataset.toggle); render(); });
+    document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{ deleteEvent(b.dataset.del); render(); });
+    document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>{
+      editingId=b.dataset.edit; const f=findEvent(editingId); formMonth=f?f.month:null; render();
+      $("#content").scrollIntoView({behavior:"smooth",block:"start"});
+    });
+  }
+
+  (async function init(){ await load(); render(); })();
+})();
+</script>
